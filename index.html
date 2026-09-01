@@ -3,14 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vidaa Browser</title>
+  <meta name="theme-color" content="#ffffff">
+  <title>VIDAA Browser</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="browser-container">
-    <input type="text" id="url" placeholder="Enter URL" />
-    <button onclick="loadPage()">Go</button>
-    <iframe id="browser" width="100%" height="80%"></iframe>
+  <div class="browser-shell">
+    <header class="topbar">
+      <div class="tab-strip">
+        <div class="tab active"><span class="tab-icon">🌐</span><span id="tabTitle">New Tab</span><button class="tab-close" aria-label="Close tab">×</button></div>
+        <button class="new-tab" aria-label="New tab">+</button>
+      </div>
+      <div class="toolbar">
+        <button class="nav-btn" id="backBtn" aria-label="Back">‹</button>
+        <button class="nav-btn" id="forwardBtn" aria-label="Forward">›</button>
+        <button class="nav-btn reload" id="reloadBtn" aria-label="Reload">↻</button>
+        <button class="nav-btn" id="homeBtn" aria-label="Home">⌂</button>
+        <form id="addressForm" class="address-wrap">
+          <span class="site-icon">⌕</span>
+          <input type="text" id="url" autocomplete="off" spellcheck="false" placeholder="Search Google or type a URL">
+          <button type="button" id="bookmarkBtn" class="inside-btn" aria-label="Bookmark">☆</button>
+        </form>
+        <button class="menu-btn" id="menuBtn" aria-label="Menu">⋮</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section id="startPage" class="start-page">
+        <div class="brand"><span class="brand-mark">V</span><span>VIDAA Browser</span></div>
+        <form id="homeSearchForm" class="home-search">
+          <span>⌕</span><input id="homeSearch" type="text" placeholder="Search the web" autocomplete="off"><button>Search</button>
+        </form>
+        <div class="shortcuts">
+          <button class="shortcut" data-url="https://www.google.com"><span>G</span><b>Google</b></button>
+          <button class="shortcut" data-url="https://www.youtube.com"><span>▶</span><b>YouTube</b></button>
+          <button class="shortcut" data-url="https://www.wikipedia.org"><span>W</span><b>Wikipedia</b></button>
+          <button class="shortcut" data-url="https://www.github.com"><span>⌘</span><b>GitHub</b></button>
+        </div>
+      </section>
+      <iframe id="browser" title="Web content" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </main>
+
+    <div id="menu" class="menu hidden">
+      <button id="menuHome">Home</button>
+      <button id="menuReload">Reload</button>
+      <button id="fullscreenBtn">Fullscreen</button>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>

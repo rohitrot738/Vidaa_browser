@@ -14,7 +14,7 @@
     'facebook.com','instagram.com','x.com','twitter.com','netflix.com'
   ];
 
-  function needsNative(url){
+  function needsFullPage(url){
     try{
       var host=new URL(url).hostname.toLowerCase().replace(/^www\./,'');
       return embeddedBlockedHosts.some(function(item){return host===item||host.slice(-(item.length+1))==='.'+item;});
@@ -28,37 +28,33 @@
     menu.classList.add('hidden');
   }
 
-  function showNativeRequired(target){
+  function showFullPagePrompt(target){
     updateChrome(target);
     start.style.display='none';
     frame.style.display='none';
     compat.classList.remove('hidden');
-    compatText.textContent=BrowserCore.hostname(target)+' needs the privileged VIDAA browser/webview adapter instead of the embedded fallback.';
+    compatText.textContent=BrowserCore.hostname(target)+' blocks embedded display. Open it in full-page mode using the VIDAA platform web engine.';
   }
 
-  function openSystem(target){
+  function openFullPage(target){
     target=target||currentTarget||BrowserCore.normalize(address.value);
-    if(!target)return;
+    if(!target)return false;
     var adapter=BrowserCore.getNativeAdapter();
     if(adapter){
-      try{adapter.open(target);return;}catch(e){}
+      try{return adapter.open(target)!==false;}catch(e){}
     }
-    var opened=null;
-    try{opened=window.open(target,'_blank');}catch(e){}
-    if(!opened)window.location.href=target;
+    try{window.location.href=target;return true;}catch(e2){return false;}
   }
 
   function openWithoutHistory(target){
     if(!target)return;
     updateChrome(target);
-    var adapter=BrowserCore.getNativeAdapter();
-    if(adapter){
-      compat.classList.add('hidden');
-      start.style.display='none';
-      frame.style.display='none';
-      try{adapter.open(target);return;}catch(e){}
+
+    if(needsFullPage(target)){
+      showFullPagePrompt(target);
+      return;
     }
-    if(needsNative(target)){showNativeRequired(target);return;}
+
     compat.classList.add('hidden');
     start.style.display='none';
     frame.style.display='block';
@@ -83,7 +79,11 @@
     try{address.focus();}catch(e){}
   }
 
-  window.VIDAA_UI={openWithoutHistory:openWithoutHistory,showHome:showHome};
+  window.VIDAA_UI={
+    openWithoutHistory:openWithoutHistory,
+    showHome:showHome,
+    openFullPage:openFullPage
+  };
   window.loadPage=function(){navigate(address.value,true);};
 
   document.getElementById('addressForm').addEventListener('submit',function(e){e.preventDefault();navigate(address.value,true);});
@@ -91,13 +91,13 @@
   Array.prototype.forEach.call(document.querySelectorAll('.shortcut'),function(el){el.addEventListener('click',function(){navigate(el.getAttribute('data-url'),true);});});
   document.getElementById('backBtn').addEventListener('click',function(){var u=BrowserCore.back();if(u)openWithoutHistory(u);else showHome();});
   document.getElementById('forwardBtn').addEventListener('click',function(){var u=BrowserCore.forward();if(u)openWithoutHistory(u);});
-  document.getElementById('reloadBtn').addEventListener('click',function(){if(currentTarget)openWithoutHistory(currentTarget);});
+  document.getElementById('reloadBtn').addEventListener('click',function(){if(frame.style.display==='block'&&frame.src){var src=frame.src;frame.src='about:blank';setTimeout(function(){frame.src=src;},20);}else if(currentTarget)openWithoutHistory(currentTarget);});
   document.getElementById('homeBtn').addEventListener('click',showHome);
   document.getElementById('menuBtn').addEventListener('click',function(){menu.classList.toggle('hidden');});
   document.getElementById('menuHome').addEventListener('click',function(){menu.classList.add('hidden');showHome();});
   document.getElementById('menuReload').addEventListener('click',function(){menu.classList.add('hidden');document.getElementById('reloadBtn').click();});
-  document.getElementById('menuDirect').addEventListener('click',function(){menu.classList.add('hidden');openSystem();});
-  document.getElementById('openDirectBtn').addEventListener('click',function(){openSystem(currentTarget);});
+  document.getElementById('menuDirect').addEventListener('click',function(){menu.classList.add('hidden');openFullPage();});
+  document.getElementById('openDirectBtn').addEventListener('click',function(){openFullPage(currentTarget);});
   document.getElementById('cancelDirectBtn').addEventListener('click',showHome);
   document.getElementById('fullscreenBtn').addEventListener('click',function(){menu.classList.add('hidden');var el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();});
   document.getElementById('bookmarkBtn').addEventListener('click',function(){this.textContent=this.textContent==='★'?'☆':'★';});

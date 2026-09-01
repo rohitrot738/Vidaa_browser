@@ -7,8 +7,10 @@
     RIGHT: 39,
     DOWN: 40,
     ENTER: 13,
-    BACK: 8,
-    ESC: 27
+    BACKSPACE: 8,
+    ESC: 27,
+    /* Common TV/browser back key codes used by smart-TV engines. */
+    TV_BACK: [461, 10009]
   };
 
   function focusables() {
@@ -62,16 +64,29 @@
     if (best) best.focus();
   }
 
+  function isTypingElement(el) {
+    if (!el) return false;
+    var tag = String(el.tagName || '').toUpperCase();
+    return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable === true;
+  }
+
+  function isTvBack(code) {
+    return KEY.TV_BACK.indexOf(code) !== -1;
+  }
+
   document.addEventListener('keydown', function (e) {
-    var code = e.keyCode || e.which;
+    var code = e.keyCode || e.which || 0;
     var active = document.activeElement;
-    var typing = active && active.tagName === 'INPUT';
+    var typing = isTypingElement(active);
 
     if (code === KEY.LEFT && !typing) { e.preventDefault(); move('left'); }
     else if (code === KEY.RIGHT && !typing) { e.preventDefault(); move('right'); }
     else if (code === KEY.UP && !typing) { e.preventDefault(); move('up'); }
     else if (code === KEY.DOWN && !typing) { e.preventDefault(); move('down'); }
-    else if ((code === KEY.BACK || code === KEY.ESC) && window.BrowserCore && BrowserCore.canGoBack()) {
+    else if (
+      ((code === KEY.BACKSPACE && !typing) || code === KEY.ESC || isTvBack(code)) &&
+      window.BrowserCore && BrowserCore.canGoBack()
+    ) {
       e.preventDefault();
       var url = BrowserCore.back();
       if (window.VIDAA_UI && url) window.VIDAA_UI.openWithoutHistory(url);

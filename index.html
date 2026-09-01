@@ -41,12 +41,24 @@
           <button class="shortcut" data-url="https://www.github.com"><span>⌘</span><b>GitHub</b></button>
         </div>
       </section>
+
+      <section id="compatPage" class="compat-page hidden">
+        <div class="compat-card">
+          <div class="compat-icon">↗</div>
+          <h2>This site needs Direct Mode</h2>
+          <p id="compatText">This website does not allow itself to be displayed inside another webpage.</p>
+          <button id="openDirectBtn" class="primary-action">Open Direct</button>
+          <button id="cancelDirectBtn" class="secondary-action">Back to browser</button>
+        </div>
+      </section>
+
       <iframe id="browser" title="Web content" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </main>
 
     <div id="menu" class="menu hidden">
       <button id="menuHome">Home</button>
       <button id="menuReload">Reload</button>
+      <button id="menuDirect">Open current page directly</button>
       <button id="fullscreenBtn">Fullscreen</button>
     </div>
   </div>

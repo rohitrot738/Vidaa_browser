@@ -1,0 +1,9 @@
+{
+  "_note": "Template only. Replace fields with the exact schema from the VIDAA Partner/DevKit documentation before packaging.",
+  "id": "com.rohit.vidaa.browser",
+  "name": "VIDAA Browser",
+  "version": "0.1.0",
+  "type": "web",
+  "entry": "index.html",
+  "description": "Experimental TV browser shell for VIDAA OS"
+}

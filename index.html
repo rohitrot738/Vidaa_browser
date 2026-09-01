@@ -40,29 +40,30 @@
           <button class="shortcut" data-url="https://www.wikipedia.org"><span>W</span><b>Wikipedia</b></button>
           <button class="shortcut" data-url="https://www.github.com"><span>⌘</span><b>GitHub</b></button>
         </div>
-        <div class="engine-note" id="engineNote">VIDAA Web Engine · Native adapter ready</div>
+        <div class="engine-note" id="engineNote">VIDAA Platform Web Engine</div>
       </section>
 
       <section id="compatPage" class="compat-page hidden">
         <div class="compat-card">
           <div class="compat-icon">↗</div>
-          <h2>Native browser adapter required</h2>
-          <p id="compatText">This site cannot run inside the embedded fallback. It needs the VIDAA privileged browser/webview adapter.</p>
-          <button id="openDirectBtn" class="primary-action">Open with system browser</button>
+          <h2>Open in full-page mode</h2>
+          <p id="compatText">This site blocks embedded display. VIDAA Browser can open it with the TV platform web engine.</p>
+          <button id="openDirectBtn" class="primary-action">Open full page</button>
           <button id="cancelDirectBtn" class="secondary-action">Back</button>
         </div>
       </section>
 
-      <iframe id="browser" title="Embedded fallback web content" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <iframe id="browser" title="Embedded web content" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </main>
 
     <div id="menu" class="menu hidden">
       <button id="menuHome">Home</button>
       <button id="menuReload">Reload</button>
-      <button id="menuDirect">Open with system browser</button>
+      <button id="menuDirect">Open full page</button>
       <button id="fullscreenBtn">Fullscreen</button>
     </div>
   </div>
+  <script src="vidaa-adapter.js"></script>
   <script src="browser-core.js"></script>
   <script src="remote.js"></script>
   <script src="script.js"></script>

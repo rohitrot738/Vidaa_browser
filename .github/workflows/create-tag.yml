@@ -1,0 +1,70 @@
+name: Create Version Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Version tag (example: v0.1.0)"
+        required: true
+        type: string
+      target_ref:
+        description: "Branch, tag, or commit to tag"
+        required: true
+        default: "main"
+        type: string
+      description:
+        description: "Short description of this stable version"
+        required: false
+        default: "Stable milestone"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate tag name
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='${{ inputs.tag_name }}'
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid tag: $TAG"
+            echo "Use semantic versioning, for example v0.1.0 or v0.1.0-beta.1"
+            exit 1
+          fi
+
+      - name: Checkout target
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_ref }}
+          fetch-depth: 0
+
+      - name: Refuse duplicate tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags --force
+          if git rev-parse --verify --quiet "refs/tags/${{ inputs.tag_name }}"; then
+            echo "Tag ${{ inputs.tag_name }} already exists."
+            exit 1
+          fi
+
+      - name: Create annotated tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ inputs.tag_name }}" -m "${{ inputs.description }}"
+          git push origin "${{ inputs.tag_name }}"
+
+      - name: Summary
+        shell: bash
+        run: |
+          echo "### Tag created" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: \`${{ inputs.tag_name }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Target: \`${{ inputs.target_ref }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Description: ${{ inputs.description }}" >> "$GITHUB_STEP_SUMMARY"

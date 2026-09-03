@@ -30,7 +30,15 @@ window.VIDAA_BROWSER_ADAPTER = {
 `browser-core.js` will use that adapter automatically. Until such an API is supplied, the project keeps an iframe only as a development fallback for sites that permit embedding and can fall back to the system browser for other sites.
 
 ## Packaging
-Do not treat `manifest.template.json` as a confirmed production manifest. The public material confirms VIDAA's HTML5 web-app architecture and use of application manifest/install metadata, but exact current partner packaging fields should be taken from the VIDAA Partner/DevKit documentation for the target TV generation.
+The developer build is hosted at:
+
+`https://rohitrot738.github.io/Vidaa_browser/`
+
+Run `scripts/build-package.sh` to create a versioned DevKit/source bundle and SHA-256 checksum in `dist/`. GitHub Actions also publishes the same files as a rolling `devkit-latest` pre-release whenever `main` changes.
+
+The ZIP is a developer/source bundle, not a VIDAA App Store-signed package. Do not treat `manifest.template.json` as a confirmed production manifest. VIDAA's current partner documentation is access-controlled; an official store package must use the manifest schema and signing/certification supplied to the approved Partner account.
+
+For installation on a real TV, open the hosted URL through VIDAA DevKit App Manager. See [`VIDAA_INSTALL_HINDI.md`](VIDAA_INSTALL_HINDI.md) for the Hisense U7K steps.
 
 ## Next milestones
 
@@ -39,4 +47,4 @@ Do not treat `manifest.template.json` as a confirmed production manifest. The pu
 3. Add multi-tab state and persistent history/bookmarks.
 4. Add download manager hooks supported by the platform.
 5. Add TV-safe virtual keyboard/search integration.
-6. Package and test on the real VIDAA TV.
+6. Test the hosted developer build on the real VIDAA TV.

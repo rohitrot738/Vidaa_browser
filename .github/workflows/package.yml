@@ -1,0 +1,63 @@
+name: Build VIDAA DevKit Package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate source
+        run: node tests/validate.js
+
+      - name: Build versioned package
+        run: bash scripts/build-package.sh "$RUNNER_TEMP/vidaa-package"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vidaa-browser-devkit
+          path: |
+            ${{ runner.temp }}/vidaa-package/*.zip
+            ${{ runner.temp }}/vidaa-package/*.sha256
+          if-no-files-found: error
+
+      - name: Publish rolling developer pre-release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          assets=("$RUNNER_TEMP"/vidaa-package/*.zip "$RUNNER_TEMP"/vidaa-package/*.sha256)
+          if (( ${#assets[@]} != 2 )); then
+            echo "Expected ZIP and SHA-256 files, found ${#assets[@]}" >&2
+            exit 1
+          fi
+          if gh release view devkit-latest >/dev/null 2>&1; then
+            gh release upload devkit-latest "${assets[@]}" --clobber
+            gh release edit devkit-latest \
+              --title "VIDAA Browser DevKit Latest" \
+              --notes "Developer/source bundle for VIDAA DevKit testing. Install the hosted app URL from VIDAA_INSTALL_HINDI.md; this is not a signed App Store package." \
+              --prerelease
+          else
+            gh release create devkit-latest "${assets[@]}" \
+              --target "$GITHUB_SHA" \
+              --title "VIDAA Browser DevKit Latest" \
+              --notes "Developer/source bundle for VIDAA DevKit testing. Install the hosted app URL from VIDAA_INSTALL_HINDI.md; this is not a signed App Store package." \
+              --prerelease
+          fi
